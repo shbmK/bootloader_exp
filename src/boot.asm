@@ -18,6 +18,8 @@ start:
     mov si, msg_loading
     call print_string
 
+    mov si, DISK_RETRIES
+.read_retry:
     ; BIOS INT 13h read:
     ; - CHS: cylinder=0, head=0, sector=2 (right after boot sector)
     ; - Count: STAGE2_SECTORS sectors
@@ -30,8 +32,17 @@ start:
     mov dl, [boot_drive]
     mov bx, 0x7E00
     int 0x13
-    jc disk_error
+    jnc load_ok
 
+    ; Reset disk system, then retry read a few times.
+    xor ah, ah
+    mov dl, [boot_drive]
+    int 0x13
+    dec si
+    jnz .read_retry
+    jmp disk_error
+
+load_ok:
     mov si, msg_ok
     call print_string
     jmp 0x0000:0x7E00
@@ -57,6 +68,7 @@ print_string:
 
 boot_drive: db 0
 STAGE2_SECTORS equ 8
+DISK_RETRIES equ 3
 msg_loading: db "Loading stage2...", 0
 msg_ok:      db " OK", 13, 10, 0
 msg_err:     db " ERR", 13, 10, 0

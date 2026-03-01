@@ -18,6 +18,12 @@ Current scope:
 
 ## Build
 
+Prerequisites:
+- `nasm`
+- `gcc` (with 32/16-bit capable toolchain)
+- `binutils` (`ld`, `objcopy`)
+- `qemu-system-i386` (for running)
+
 ```bash
 make
 ```
@@ -28,6 +34,25 @@ Artifacts are generated under `build/`.
 
 ```bash
 make run
+```
+
+You should see stage1 text like:
+- `Loading stage2... OK` on successful read/jump
+- `Loading stage2... ERR` if read fails after retries
+
+The stage1 loader currently retries disk reads 3 times with BIOS disk reset between attempts.
+
+## Quick setup examples
+
+Arch Linux:
+```bash
+sudo pacman -S --needed nasm gcc binutils qemu-system-i386
+```
+
+Debian/Ubuntu:
+```bash
+sudo apt update
+sudo apt install -y nasm gcc binutils qemu-system-x86
 ```
 
 ## Notes
