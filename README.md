@@ -3,7 +3,8 @@
 This project is a starter skeleton for a tiny x86 BIOS bootloader flow that we can refine step-by-step.
 
 Current scope:
-- Stage 1 boot sector (`src/boot.asm`) with BIOS signature.
+- Stage 1 boot sector (`src/boot.asm`) reads fixed stage2 sectors via BIOS `INT 13h`.
+- Stage 1 prints basic boot status messages using BIOS teletype output (`INT 10h`).
 - Stage 2 freestanding C code (`src/stage2.c`) as a placeholder.
 - Minimal build system (`Makefile`) and linker script (`linker.ld`).
 
@@ -32,7 +33,7 @@ make run
 ## Notes
 
 - This is intentionally a skeleton, not a complete production bootloader.
+- Stage 1 currently assumes stage2 fits in 8 sectors and lives right after sector 1.
 - Next iterations can add:
-  - Sector loading from disk in Stage 1
   - GDT setup and protected-mode transition
   - Real screen output and memory map probing

@@ -1,10 +1,12 @@
 ; Minimal BIOS boot sector skeleton.
-; This is intentionally tiny; disk-loading logic is a TODO.
+; Loads fixed-size stage2 from disk to 0x7E00 and jumps there.
 
 BITS 16
 ORG 0x7C00
 
 start:
+    mov [boot_drive], dl
+
     cli
     xor ax, ax
     mov ds, ax
@@ -13,11 +15,51 @@ start:
     mov sp, 0x7C00
     sti
 
-    ; TODO: load stage2 from disk to 0x7E00, then jump there.
-    ; For now this skeleton just hangs.
+    mov si, msg_loading
+    call print_string
+
+    ; BIOS INT 13h read:
+    ; - CHS: cylinder=0, head=0, sector=2 (right after boot sector)
+    ; - Count: STAGE2_SECTORS sectors
+    ; - Destination: 0000:7E00
+    mov ah, 0x02
+    mov al, STAGE2_SECTORS
+    mov ch, 0x00
+    mov cl, 0x02
+    mov dh, 0x00
+    mov dl, [boot_drive]
+    mov bx, 0x7E00
+    int 0x13
+    jc disk_error
+
+    mov si, msg_ok
+    call print_string
+    jmp 0x0000:0x7E00
+
+disk_error:
+    mov si, msg_err
+    call print_string
+    cli
 hang:
     hlt
     jmp hang
+
+print_string:
+    mov ah, 0x0E
+.next:
+    lodsb
+    test al, al
+    jz .done
+    int 0x10
+    jmp .next
+.done:
+    ret
+
+boot_drive: db 0
+STAGE2_SECTORS equ 8
+msg_loading: db "Loading stage2...", 0
+msg_ok:      db " OK", 13, 10, 0
+msg_err:     db " ERR", 13, 10, 0
 
 times 510-($-$$) db 0
 dw 0xAA55
