@@ -1,4 +1,4 @@
-# Basic C Bootloader Skeleton
+# Basic C Bootloader Skeleton - #BasicBoot
 
 This project is a starter skeleton for a tiny x86 BIOS bootloader flow that we can refine step-by-step.
 
