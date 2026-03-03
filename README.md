@@ -5,7 +5,7 @@ This project is a starter skeleton for a tiny x86 BIOS bootloader flow that we c
 Current scope:
 - Stage 1 boot sector (`src/boot.asm`) reads fixed stage2 sectors via BIOS `INT 13h`.
 - Stage 1 prints basic boot status messages using BIOS teletype output (`INT 10h`).
-- Stage 2 freestanding C code (`src/stage2.c`) as a placeholder.
+- Stage 2 freestanding C code (`src/stage2.c`) writes a VGA banner and emits debug bytes to port `0xE9`.
 - Minimal build system (`Makefile`) and linker script (`linker.ld`).
 
 ## Layout
@@ -41,6 +41,7 @@ You should see stage1 text like:
 - `Loading stage2... ERR` if read fails after retries
 
 The stage1 loader currently retries disk reads 3 times with BIOS disk reset between attempts.
+The build also verifies Stage 2 fits in 8 sectors (4096 bytes) and pads it to fixed size.
 
 ## Quick setup examples
 
